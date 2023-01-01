@@ -1,18 +1,125 @@
 import { useLoaderData } from '@remix-run/react';
 import { getCollections } from '~/providers/collections/collections';
 import { CollectionCard } from '~/components/collections/CollectionCard';
-import { BookOpenIcon } from '@heroicons/react/24/solid';
-import { LoaderArgs } from '@remix-run/server-runtime';
+import { LoaderArgs, MetaFunction } from '@remix-run/server-runtime';
+import { GoalsList } from '~/components/iworkout/GoalsList';
+import { FeaturedArticles } from '~/components/iworkout/FeaturedArticles';
+import { LevelsList } from '~/components/iworkout/LevelsList';
+import { MusclesList } from '~/components/iworkout/MusclesList';
+
+async function getGoals() {
+  //?populate=* fills in the image meta data
+  const url = 'http://localhost:1337/api/goals?populate=*';
+  //process.env.STRAPI_JWT
+  const bearer =
+    'd026e0e3c644174974de2cb463336c76116a98eae2533b1749cc2fc7b25cd220422943f58b377a91f3582571708eda9582c7d64936379ba0c31b51c126aae313f6c81220dbdb902481f8ca1db4a47e41ba7940151845faac33868a7dc1be1df9bf608eba16c669ab2f73233fbe43110b81631daa045c244aa8249b910d29bcd8';
+
+  // Fetch data from url with bearer token
+  const res = await fetch(url, {
+    headers: {
+      Authorization: `Bearer ${bearer}`,
+    },
+  });
+
+  if (!res.ok) {
+    return [];
+  }
+
+  return res.json();
+}
+
+async function getLevels() {
+  console.log('getting levels');
+
+  const url = 'http://localhost:1337/api/ability-levels';
+  //process.env.STRAPI_JWT
+  const bearer =
+    'd026e0e3c644174974de2cb463336c76116a98eae2533b1749cc2fc7b25cd220422943f58b377a91f3582571708eda9582c7d64936379ba0c31b51c126aae313f6c81220dbdb902481f8ca1db4a47e41ba7940151845faac33868a7dc1be1df9bf608eba16c669ab2f73233fbe43110b81631daa045c244aa8249b910d29bcd8';
+
+  // Fetch data from url with bearer token
+  const res = await fetch(url, {
+    headers: {
+      Authorization: `Bearer ${bearer}`,
+    },
+  });
+
+  if (!res.ok) {
+    return [];
+  }
+
+  return res.json();
+}
+
+async function getArticles() {
+  const url = 'http://localhost:1337/api/articles?populate=*';
+  //process.env.STRAPI_JWT
+  const bearer =
+    'd026e0e3c644174974de2cb463336c76116a98eae2533b1749cc2fc7b25cd220422943f58b377a91f3582571708eda9582c7d64936379ba0c31b51c126aae313f6c81220dbdb902481f8ca1db4a47e41ba7940151845faac33868a7dc1be1df9bf608eba16c669ab2f73233fbe43110b81631daa045c244aa8249b910d29bcd8';
+
+  // Fetch data from url with bearer token
+  const res = await fetch(url, {
+    headers: {
+      Authorization: `Bearer ${bearer}`,
+    },
+  });
+
+  if (!res.ok) {
+    return [];
+  }
+
+  return res.json();
+}
+
+async function getMuscles() {
+  const url = 'http://localhost:1337/api/muscles';
+  //process.env.STRAPI_JWT
+  const bearer =
+    'd026e0e3c644174974de2cb463336c76116a98eae2533b1749cc2fc7b25cd220422943f58b377a91f3582571708eda9582c7d64936379ba0c31b51c126aae313f6c81220dbdb902481f8ca1db4a47e41ba7940151845faac33868a7dc1be1df9bf608eba16c669ab2f73233fbe43110b81631daa045c244aa8249b910d29bcd8';
+
+  // Fetch data from url with bearer token
+  const res = await fetch(url, {
+    headers: {
+      Authorization: `Bearer ${bearer}`,
+    },
+  });
+
+  if (!res.ok) {
+    return [];
+  }
+
+  return res.json();
+}
+
+export const meta: MetaFunction = ({ data }) => {
+  return {
+    title: 'iWorkout - fitness equipment and advice',
+    // title: data?.goal?.attributes.Name
+    //   ? `${data.goal.attributes.Name} - ${APP_META_TITLE}`
+    //   : APP_META_TITLE,
+  };
+};
 
 export async function loader({ request }: LoaderArgs) {
   const collections = await getCollections(request);
+  const articles: any = await getArticles();
+  const goals = await getGoals();
+  const levels = await getLevels();
+  const muscles = await getMuscles();
+
+  console.log('DATA', goals, levels, articles);
+  console.log('articles', articles.data[0]);
   return {
     collections,
+    articles,
+    goals,
+    levels,
+    muscles,
   };
 }
 
 export default function Index() {
-  const { collections } = useLoaderData<typeof loader>();
+  const { collections, articles, levels, goals, muscles } =
+    useLoaderData<typeof loader>();
   const headerImage = collections[0]?.featuredAsset?.preview;
   return (
     <>
@@ -35,27 +142,14 @@ export default function Index() {
         <div className="relative max-w-3xl mx-auto py-32 px-6 flex flex-col items-center text-center sm:py-64 lg:px-0">
           <div className="relative bg-zinc-800 bg-opacity-0 rounded-lg p-0">
             <h1 className="text-6xl text-transparent bg-clip-text font-extrabold tracking-normal lg:text-6xl bg-gradient-to-r from-yellow-600 via-red-500 to-blue-600">
-              Vendure Remix Starter
+              iWorkout
             </h1>
           </div>
 
           <p className="mt-4 text-2xl text-white">
-            A headless commerce storefront starter kit built with{' '}
-            <a
-              href="https://www.vendure.io"
-              className="text-blue-300 hover:text-blue-500"
-            >
-              Vendure
-            </a>{' '}
-            &{' '}
-            <a
-              href="~/routes/__cart/index"
-              className="text-red-300 hover:text-red-500"
-            >
-              Remix
-            </a>
+            Fitness and health for everyone
           </p>
-          <p className="mt-4 text-gray-300 space-x-1">
+          {/* <p className="mt-4 text-gray-300 space-x-1">
             <BookOpenIcon className="w-5 h-5 inline" />
             <span>Read more:</span>
             <a
@@ -64,7 +158,7 @@ export default function Index() {
             >
               Lightning Fast Headless Commerce with Vendure and Remix
             </a>
-          </p>
+          </p> */}
         </div>
       </div>
 
@@ -92,6 +186,11 @@ export default function Index() {
             </div>
           </div>
         </div>
+
+        <GoalsList goals={goals!} />
+        <FeaturedArticles articles={articles!} />
+        <LevelsList levels={levels!} />
+        <MusclesList muscles={muscles!} />
 
         <div className="mt-6 px-4 sm:hidden">
           <a

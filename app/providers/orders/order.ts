@@ -61,6 +61,11 @@ export function setOrderShippingMethod(
   return sdk.setOrderShippingMethod({ shippingMethodId }, options);
 }
 
+export async function getOrdersForCustomer(customerId: string) {
+  //  return sdk.get(undefined, options);
+  return { orders: [] };
+}
+
 gql`
   mutation setCustomerForOrder($input: CreateCustomerInput!) {
     setCustomerForOrder(input: $input) {

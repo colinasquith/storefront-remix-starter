@@ -26,7 +26,7 @@ export function Header({
       <div className="bg-zinc-100 text-gray-600 shadow-inner text-center text-sm py-2 px-2 xl:px-0">
         <div className="max-w-6xl mx-2 md:mx-auto flex items-center justify-between">
           <div>
-            <p className="hidden sm:block">
+            {/* <p className="hidden sm:block">
               Exclusive: Get your own{' '}
               <a
                 href="https://github.com/vendure-ecommerce/storefront-remix-starter"
@@ -35,7 +35,7 @@ export function Header({
               >
                 FREE storefront starter kit
               </a>
-            </p>
+            </p> */}
           </div>
           <div>
             <Link
@@ -49,16 +49,22 @@ export function Header({
         </div>
       </div>
       <div className="max-w-6xl mx-auto p-4 flex items-center space-x-4">
-        <h1 className="text-white w-10">
+        <span className="text-white w-24">
           <Link to="/">
-            <img
+            {/* <img
               src="/cube-logo-small.webp"
               width={40}
               height={31}
               alt="Vendure logo"
+            /> */}
+            <img
+              src="/images/iworkout-logo.png"
+              width={100}
+              height={40}
+              alt="iWorkout logo"
             />
           </Link>
-        </h1>
+        </span>
         <div className="flex space-x-4 hidden sm:block">
           {data.collections.map((collection) => (
             <Link

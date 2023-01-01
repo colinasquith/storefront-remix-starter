@@ -2,13 +2,15 @@ import { Form, Link, useLoaderData } from '@remix-run/react';
 import { DataFunctionArgs, json, redirect } from '@remix-run/server-runtime';
 import { logout } from '~/providers/account/account';
 import { getActiveCustomer } from '~/providers/customer/customer';
+import { getOrdersForCustomer } from '~/providers/orders/order';
 
 export async function loader({ request, params }: DataFunctionArgs) {
   const { activeCustomer } = await getActiveCustomer({ request });
+  const { orders } = await getOrdersForCustomer('1234');
   if (!activeCustomer) {
     return redirect('/sign-in');
   }
-  return json({ activeCustomer });
+  return json({ activeCustomer, orders });
 }
 
 export async function action({ request, params }: DataFunctionArgs) {
@@ -22,7 +24,7 @@ export async function action({ request, params }: DataFunctionArgs) {
   return {};
 }
 
-export default function AccountDashboard() {
+export default function AccountOrders() {
   const { activeCustomer } = useLoaderData<typeof loader>();
   const { firstName, lastName } = activeCustomer!;
   return (
@@ -44,15 +46,11 @@ export default function AccountDashboard() {
       </Form>
       <div className="h-96 border-2 border-dashed border-slate-200 rounded-lg flex items-center justify-center">
         <div className="text-xl text-gray-500">
-          <Link to="/account/my-orders">My Orders</Link>
-          <p>should next bit be something else</p>
-          Account dashboard not done yet.{' '}
-          <a
-            className="text-primary-600"
-            href="https://github.com/vendure-ecommerce/storefront-remix-starter"
-          >
-            Want to help?
-          </a>
+          <h1>My Orders</h1>
+          <p>list em...</p>
+          <p>
+            <Link to="/account">Back to account dash</Link>
+          </p>
         </div>
       </div>
     </div>
