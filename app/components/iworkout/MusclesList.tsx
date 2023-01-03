@@ -2,11 +2,11 @@ import React from 'react';
 import { slugify } from '~/utils/slugify';
 import { JumpCard } from './JumpCard';
 
-// interface MusclesListProps {
-//   muscles: any;
-// }
+interface MusclesListProps {
+  muscles: any;
+}
 
-export const MusclesList = ({ muscles }: any) => {
+export const MusclesList = ({ muscles }: MusclesListProps) => {
   return (
     <div className="mb-4 mt-4">
       <p className="font-bold">Muscles</p>

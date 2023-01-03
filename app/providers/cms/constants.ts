@@ -1,0 +1,4 @@
+export const strapi_url = 'http://localhost:1337';
+export const strapi_api_key =
+  'd026e0e3c644174974de2cb463336c76116a98eae2533b1749cc2fc7b25cd220422943f58b377a91f3582571708eda9582c7d64936379ba0c31b51c126aae313f6c81220dbdb902481f8ca1db4a47e41ba7940151845faac33868a7dc1be1df9bf608eba16c669ab2f73233fbe43110b81631daa045c244aa8249b910d29bcd8';
+// //process.env.STRAPI_JWT

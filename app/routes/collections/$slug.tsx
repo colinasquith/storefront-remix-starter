@@ -10,7 +10,6 @@ import { useRef, useState } from 'react';
 import { FacetFilterTracker } from '~/components/facet-filter/facet-filter-tracker';
 import FacetFilterControls from '~/components/facet-filter/FacetFilterControls';
 import { FiltersButton } from '~/components/FiltersButton';
-import { PhotographIcon } from '@heroicons/react/solid';
 
 export const meta: MetaFunction = ({ data }) => {
   return {
@@ -27,6 +26,7 @@ export async function loader({ params, request, context }: DataFunctionArgs) {
       request,
       context,
     });
+
   const collection = (await sdk.collection({ slug: params.slug })).collection;
   if (!collection?.id || !collection?.name) {
     throw new Response('Not Found', {
@@ -90,9 +90,13 @@ export default function CollectionSlug() {
         />
         <div className="sm:col-span-5 lg:col-span-4">
           <div className="grid grid-cols-1 gap-y-10 gap-x-6 sm:grid-cols-2 lg:grid-cols-4 xl:gap-x-8">
-            {result.items.map((item) => (
-              <ProductCard key={item.productId} {...item}></ProductCard>
-            ))}
+            {result.items ? (
+              result.items.map((item) => (
+                <ProductCard key={item.productId} {...item}></ProductCard>
+              ))
+            ) : (
+              <p className="mt-4">There are no products in this collection.</p>
+            )}
           </div>
         </div>
       </div>

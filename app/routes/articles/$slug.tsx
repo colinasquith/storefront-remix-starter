@@ -13,65 +13,43 @@ import {
 import { APP_META_TITLE } from '~/constants';
 import { CartLoaderData } from '~/routes/api/active-order';
 import { PhotoIcon } from '@heroicons/react/24/outline';
+import { getArticleBySlug } from '~/providers/cms/article';
+import { Breadcrumbs } from '~/components/Breadcrumbs';
+import { slugify } from '~/utils/slugify';
 
 export const meta: MetaFunction = ({ data }) => {
   return {
-    title: data?.goal?.attributes.Name
-      ? `${data.goal.attributes.Name} - ${APP_META_TITLE}`
+    title: data?.article?.attributes.Title
+      ? `${data.article.attributes.Title} - ${APP_META_TITLE}`
       : APP_META_TITLE,
   };
 };
 
-async function getArticleBySlug(slug: string): Promise<any> {
-  const url = 'http://localhost:1337/api/articles';
-  //process.env.STRAPI_JWT
-  const bearer =
-    'd026e0e3c644174974de2cb463336c76116a98eae2533b1749cc2fc7b25cd220422943f58b377a91f3582571708eda9582c7d64936379ba0c31b51c126aae313f6c81220dbdb902481f8ca1db4a47e41ba7940151845faac33868a7dc1be1df9bf608eba16c669ab2f73233fbe43110b81631daa045c244aa8249b910d29bcd8';
-
-  // Fetch data from url with bearer token
-  const res = await fetch(url, {
-    headers: {
-      Authorization: `Bearer ${bearer}`,
-    },
-  });
-
-  if (!res.ok) {
-    return [];
-  }
-
-  // Find the goal with the matching slug
-  const articles: any = await res.json();
-
-  // Better way to compare strings in JS
-  const article = articles.data.find(
-    (article: any) =>
-      article.attributes.Name.toLowerCase() === slug.replace('-', ' '),
-  );
-
-  console.log('GREGGY', article);
-
-  return { article: article };
-}
-
 export async function loader({ params, request }: DataFunctionArgs) {
   const { article } = await getArticleBySlug(params.slug!);
-
-  console.log('GOALZY', article);
 
   if (!article) {
     throw new Response('Not Found', {
       status: 404,
     });
   }
-  //  const session = await sessionStorage.getSession(
-  //    request?.headers.get('Cookie'),
-  //  );
-  //  const error = session.get('activeOrderError');
-  return json({ article: article! });
+
+  const breadcrumbs: { name: string; slug: string; id: string; to?: string }[] =
+    [
+      { name: 'Articles', to: '/articles/', slug: '', id: '' },
+      {
+        name: article.attributes.Title,
+        to: `/articles/${params.slug}/`,
+        slug: '',
+        id: '',
+      },
+    ];
+
+  return json({ article: article!, breadcrumbs });
 }
 
 export default function ArticleSlug() {
-  const { article } = useLoaderData<typeof loader>();
+  const { article, breadcrumbs } = useLoaderData<typeof loader>();
   const caught = useCatch();
   const { activeOrderFetcher } = useOutletContext<{
     activeOrderFetcher: FetcherWithComponents<CartLoaderData>;
@@ -82,24 +60,74 @@ export default function ArticleSlug() {
     return <div>Article not found!</div>;
   }
 
+  // const htmlDecode = (input: string) => {
+  //   var e = document.createElement('div');
+  //   e.innerHTML = input;
+  //   return e.childNodes.length === 0 ? '' : e.childNodes[0].nodeValue;
+  // };
+
   return (
     <div>
       <div className="max-w-6xl mx-auto px-4">
         <h2 className="text-3xl sm:text-5xl font-light tracking-tight text-gray-900 my-8">
-          {article.attributes.Name}
+          {article.attributes.Title}
         </h2>
-        {/* <Breadcrumbs
-          items={
-            article.collections[article.collections.length - 1]?.breadcrumbs ?? []
-          }
-        ></Breadcrumbs> */}
+        <Breadcrumbs items={breadcrumbs}></Breadcrumbs>
 
-        <p>Articles...</p>
-        <Link to="/articles/endurance/whatever">Demo Article</Link>
-        <p>Equipment...</p>
-        <p>Nutrition...</p>
+        <div className="mt-4 mb-4 rounded md-rounded px-6 py-2 bg-gray-100 flex space-x-2">
+          <p>Goals:</p>
+          <div className="flex space-x-2">
+            {article.attributes.goals?.data.map((goal: any) => (
+              <span
+                key={goal.id}
+                className="rounded-full bg-blue-300 text-blue-800 p-2 text-sm"
+              >
+                <Link to={`/goals/${slugify(goal.attributes.Name)}/`}>
+                  {goal.attributes.Name}
+                </Link>
+              </span>
+            ))}
+          </div>
+          <p>Levels:</p>
+          <div className="flex space-x-2">
+            {article.attributes.ability_levels?.data.map((level: any) => (
+              <span
+                key={level.id}
+                className="rounded-full bg-green-300 text-green-800 p-2 text-sm"
+              >
+                <Link to={`/ability-levels/${slugify(level.attributes.Name)}/`}>
+                  {level.attributes.Name}
+                </Link>
+              </span>
+            ))}
+          </div>
+          <p>Muscles:</p>
+          <div className="flex space-x-2">
+            {article.attributes.muscles?.data.map((muscle: any) => (
+              <span
+                key={muscle.id}
+                className="rounded-full bg-orange-300 text-orange-800 p-2 text-sm"
+              >
+                <Link to={`/muscles/${slugify(muscle.attributes.Name)}/`}>
+                  {muscle.attributes.Name}
+                </Link>
+              </span>
+            ))}
+          </div>
+        </div>
+        <div
+          className="mt-4 mb-4 article-content"
+          dangerouslySetInnerHTML={{
+            __html: article.attributes.Content,
+          }}
+        ></div>
 
-        <Link to="/">back to Home</Link>
+        <div className="rounded md-rounded p-6 bg-gray-200">
+          <p>Related Articles...</p>
+          <Link to="/articles/endurance/whatever">Demo Article</Link>
+          <p>Equipment...</p>
+          <p>Nutrition...</p>
+        </div>
       </div>
     </div>
   );

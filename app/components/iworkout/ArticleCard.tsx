@@ -1,16 +1,13 @@
 import { Link } from '@remix-run/react';
+import { strapi_url } from '~/providers/cms/constants';
 
-export const ArticleCard = ({
-  name,
-  to,
-  image,
-}: {
+interface ArticleCardProps {
   name: string;
   to: string;
   image: string;
-}) => {
-  const strapi_url = 'http://localhost:1337';
+}
 
+export const ArticleCard = ({ name, to, image }: ArticleCardProps) => {
   const imgStyle = image
     ? {
         backgroundImage: `url('${strapi_url}${image}')`,

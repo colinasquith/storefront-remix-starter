@@ -5,6 +5,21 @@ module.exports = {
   // theme: {
   //   extend: {},
   // },
+  safelist: [
+    'bg-white',
+    'h-14',
+    'h-36',
+    'h-64', //?
+    'h-72',
+    'text-gray-300',
+    'text-red-300',
+    'text-gray-300',
+    {
+      pattern: /(bg|text)-(red|green|blue|gray)-(100|200|800|900)/,
+      pattern: /grid-cols-(1|2|3|4)/,
+    },
+  ],
+
   plugins: [require('@tailwindcss/forms')],
   mode: 'jit',
   content: ['./app/**/*.{ts,tsx}'],

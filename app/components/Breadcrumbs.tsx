@@ -4,7 +4,7 @@ import { Link } from '@remix-run/react';
 export function Breadcrumbs({
   items,
 }: {
-  items: { name: string; slug: string; id: string }[];
+  items: { name: string; slug: string; id: string; to?: string }[];
 }) {
   return (
     <nav className="flex" aria-label="Breadcrumb">
@@ -32,7 +32,7 @@ export function Breadcrumbs({
                   <path d="M5.555 17.776l8-16 .894.448-8 16-.894-.448z" />
                 </svg>
                 <Link
-                  to={'/collections/' + item.slug}
+                  to={item.to ? item.to : '/collections/' + item.slug}
                   className="ml-2 md:ml-4 text-xs md:text-sm font-medium text-gray-500 hover:text-gray-700"
                 >
                   {item.name}

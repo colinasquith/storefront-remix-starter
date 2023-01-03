@@ -16,63 +16,48 @@ import { PhotoIcon } from '@heroicons/react/24/outline';
 import { FeaturedArticles } from '~/components/iworkout/FeaturedArticles';
 import { FeaturedEquipment } from '~/components/iworkout/FeaturedEquipment';
 import { FeaturedNutrition } from '~/components/iworkout/FeaturedNutrition';
+import { getLevelBySlug } from '~/providers/cms/level';
+import { Breadcrumbs } from '~/components/Breadcrumbs';
+import { getArticlesByLevel } from '~/providers/cms/article';
+import { getProductsForLevel } from '~/providers/cms/products-custom';
 
 export const meta: MetaFunction = ({ data }) => {
   return {
-    title: data?.goal?.attributes.Name
-      ? `${data.goal.attributes.Name} - ${APP_META_TITLE}`
+    title: data?.level?.attributes.Name
+      ? `Level: ${data.level.attributes.Name} - ${APP_META_TITLE}`
       : APP_META_TITLE,
   };
 };
 
-async function getLevelBySlug(slug: string): Promise<any> {
-  const url = 'http://localhost:1337/api/ability-levels';
-  //process.env.STRAPI_JWT
-  const bearer =
-    'd026e0e3c644174974de2cb463336c76116a98eae2533b1749cc2fc7b25cd220422943f58b377a91f3582571708eda9582c7d64936379ba0c31b51c126aae313f6c81220dbdb902481f8ca1db4a47e41ba7940151845faac33868a7dc1be1df9bf608eba16c669ab2f73233fbe43110b81631daa045c244aa8249b910d29bcd8';
-
-  // Fetch data from url with bearer token
-  const res = await fetch(url, {
-    headers: {
-      Authorization: `Bearer ${bearer}`,
-    },
-  });
-
-  if (!res.ok) {
-    return [];
-  }
-
-  // Find the goal with the matching slug
-  const levels: any = await res.json();
-
-  // Better way to compare strings in JS
-  const level = levels.data.find(
-    (level: any) =>
-      level.attributes.Name.toLowerCase() === slug.replace('-', ' '),
-  );
-
-  return { level: level };
-}
-
 export async function loader({ params, request }: DataFunctionArgs) {
   const { level } = await getLevelBySlug(params.slug!);
-
-  console.log('GOALZY', level);
 
   if (!level) {
     throw new Response('Not Found', {
       status: 404,
     });
   }
-  //  const session = await sessionStorage.getSession(
-  //    request?.headers.get('Cookie'),
-  //  );
-  //  const error = session.get('activeOrderError');
-  return json({ level: level! });
+
+  const { articles } = await getArticlesByLevel(level.id);
+  const equipment = await getProductsForLevel(level, request);
+
+  const breadcrumbs: { name: string; slug: string; id: string; to?: string }[] =
+    [
+      { name: 'Ability Levels', to: '/ability-levels/', slug: '', id: '' },
+      {
+        name: level.attributes.Name,
+        to: `/ability-levels/${params.slug}/`,
+        slug: '',
+        id: '',
+      },
+    ];
+
+  return json({ level: level!, articles, equipment, breadcrumbs });
 }
 
 export default function AbilityLevelSlug() {
-  const { level } = useLoaderData<typeof loader>();
+  const { level, articles, equipment, breadcrumbs } =
+    useLoaderData<typeof loader>();
   const caught = useCatch();
   const { activeOrderFetcher } = useOutletContext<{
     activeOrderFetcher: FetcherWithComponents<CartLoaderData>;
@@ -89,17 +74,11 @@ export default function AbilityLevelSlug() {
         <h2 className="text-3xl sm:text-5xl font-light tracking-tight text-gray-900 my-8">
           {level.attributes.Name}
         </h2>
-        {/* <Breadcrumbs
-          items={
-            level.collections[level.collections.length - 1]?.breadcrumbs ?? []
-          }
-        ></Breadcrumbs> */}
+        <Breadcrumbs items={breadcrumbs}></Breadcrumbs>
 
-        <FeaturedArticles articles={[]} />
-        <FeaturedEquipment equipment={[]} />
+        <FeaturedArticles articles={articles} />
+        <FeaturedEquipment equipment={equipment} />
         <FeaturedNutrition equipment={[]} />
-
-        <Link to="/">back to Home</Link>
       </div>
     </div>
   );

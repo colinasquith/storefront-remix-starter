@@ -4,91 +4,12 @@ import { CollectionCard } from '~/components/collections/CollectionCard';
 import { LoaderArgs, MetaFunction } from '@remix-run/server-runtime';
 import { GoalsList } from '~/components/iworkout/GoalsList';
 import { FeaturedArticles } from '~/components/iworkout/FeaturedArticles';
-import { LevelsList } from '~/components/iworkout/LevelsList';
+import { AbilityLevelsList } from '~/components/iworkout/AbilityLevelsList';
 import { MusclesList } from '~/components/iworkout/MusclesList';
-
-async function getGoals() {
-  //?populate=* fills in the image meta data
-  const url = 'http://localhost:1337/api/goals?populate=*';
-  //process.env.STRAPI_JWT
-  const bearer =
-    'd026e0e3c644174974de2cb463336c76116a98eae2533b1749cc2fc7b25cd220422943f58b377a91f3582571708eda9582c7d64936379ba0c31b51c126aae313f6c81220dbdb902481f8ca1db4a47e41ba7940151845faac33868a7dc1be1df9bf608eba16c669ab2f73233fbe43110b81631daa045c244aa8249b910d29bcd8';
-
-  // Fetch data from url with bearer token
-  const res = await fetch(url, {
-    headers: {
-      Authorization: `Bearer ${bearer}`,
-    },
-  });
-
-  if (!res.ok) {
-    return [];
-  }
-
-  return res.json();
-}
-
-async function getLevels() {
-  console.log('getting levels');
-
-  const url = 'http://localhost:1337/api/ability-levels';
-  //process.env.STRAPI_JWT
-  const bearer =
-    'd026e0e3c644174974de2cb463336c76116a98eae2533b1749cc2fc7b25cd220422943f58b377a91f3582571708eda9582c7d64936379ba0c31b51c126aae313f6c81220dbdb902481f8ca1db4a47e41ba7940151845faac33868a7dc1be1df9bf608eba16c669ab2f73233fbe43110b81631daa045c244aa8249b910d29bcd8';
-
-  // Fetch data from url with bearer token
-  const res = await fetch(url, {
-    headers: {
-      Authorization: `Bearer ${bearer}`,
-    },
-  });
-
-  if (!res.ok) {
-    return [];
-  }
-
-  return res.json();
-}
-
-async function getArticles() {
-  const url = 'http://localhost:1337/api/articles?populate=*';
-  //process.env.STRAPI_JWT
-  const bearer =
-    'd026e0e3c644174974de2cb463336c76116a98eae2533b1749cc2fc7b25cd220422943f58b377a91f3582571708eda9582c7d64936379ba0c31b51c126aae313f6c81220dbdb902481f8ca1db4a47e41ba7940151845faac33868a7dc1be1df9bf608eba16c669ab2f73233fbe43110b81631daa045c244aa8249b910d29bcd8';
-
-  // Fetch data from url with bearer token
-  const res = await fetch(url, {
-    headers: {
-      Authorization: `Bearer ${bearer}`,
-    },
-  });
-
-  if (!res.ok) {
-    return [];
-  }
-
-  return res.json();
-}
-
-async function getMuscles() {
-  const url = 'http://localhost:1337/api/muscles';
-  //process.env.STRAPI_JWT
-  const bearer =
-    'd026e0e3c644174974de2cb463336c76116a98eae2533b1749cc2fc7b25cd220422943f58b377a91f3582571708eda9582c7d64936379ba0c31b51c126aae313f6c81220dbdb902481f8ca1db4a47e41ba7940151845faac33868a7dc1be1df9bf608eba16c669ab2f73233fbe43110b81631daa045c244aa8249b910d29bcd8';
-
-  // Fetch data from url with bearer token
-  const res = await fetch(url, {
-    headers: {
-      Authorization: `Bearer ${bearer}`,
-    },
-  });
-
-  if (!res.ok) {
-    return [];
-  }
-
-  return res.json();
-}
+import { getArticles } from '~/providers/cms/article';
+import { getGoals } from '~/providers/cms/goal';
+import { getLevels } from '~/providers/cms/level';
+import { getMuscles } from '~/providers/cms/muscle';
 
 export const meta: MetaFunction = ({ data }) => {
   return {
@@ -106,8 +27,6 @@ export async function loader({ request }: LoaderArgs) {
   const levels = await getLevels();
   const muscles = await getMuscles();
 
-  console.log('DATA', goals, levels, articles);
-  console.log('articles', articles.data[0]);
   return {
     collections,
     articles,
@@ -189,7 +108,7 @@ export default function Index() {
 
         <GoalsList goals={goals!} />
         <FeaturedArticles articles={articles!} />
-        <LevelsList levels={levels!} />
+        <AbilityLevelsList levels={levels!} />
         <MusclesList muscles={muscles!} />
 
         <div className="mt-6 px-4 sm:hidden">

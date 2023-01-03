@@ -13,76 +13,52 @@ import {
 import { APP_META_TITLE } from '~/constants';
 import { CartLoaderData } from '~/routes/api/active-order';
 import { PhotoIcon } from '@heroicons/react/24/outline';
-import { FeaturedArticles } from '~/components/iworkout/FeaturedArticles';
-import { FeaturedEquipment } from '~/components/iworkout/FeaturedEquipment';
-import { FeaturedNutrition } from '~/components/iworkout/FeaturedNutrition';
-import { getGoalBySlug } from '~/providers/cms/goal';
-import { getArticlesByGoal } from '~/providers/cms/article';
+import { getMuscles } from '~/providers/cms/muscle';
 import { Breadcrumbs } from '~/components/Breadcrumbs';
-import { getProductsForGoal } from '~/providers/cms/products-custom';
+import { MusclesList } from '~/components/iworkout/MusclesList';
 
 export const meta: MetaFunction = ({ data }) => {
   return {
-    title: data?.goal?.attributes.Name
-      ? `Goal: ${data.goal.attributes.Name} - ${APP_META_TITLE}`
-      : APP_META_TITLE,
+    title: 'Muscles - iWorkout',
   };
 };
 
-export async function loader({ params, request, context }: DataFunctionArgs) {
-  const { goal } = await getGoalBySlug(params.slug!);
+export async function loader({ params, request }: DataFunctionArgs) {
+  const muscles = await getMuscles();
 
-  if (!goal) {
+  if (!muscles) {
     throw new Response('Not Found', {
       status: 404,
     });
   }
 
-  const { articles } = await getArticlesByGoal(goal.id);
-  const equipment = await getProductsForGoal(goal, request);
-
   const breadcrumbs: { name: string; slug: string; id: string; to?: string }[] =
-    [
-      { name: 'Goals', to: '/goals/', slug: '', id: '' },
-      {
-        name: goal.attributes.Name,
-        to: `/goals/${params.slug}/`,
-        slug: '',
-        id: '',
-      },
-    ];
+    [{ name: 'Muscles', to: '/muscles/', slug: '', id: '' }];
 
-  //  const session = await sessionStorage.getSession(
-  //    request?.headers.get('Cookie'),
-  //  );
-  //  const error = session.get('activeOrderError');
-  return json({ goal: goal!, articles: articles!, equipment, breadcrumbs });
+  return json({ muscles: muscles!, breadcrumbs });
 }
 
-export default function GoalSlug() {
-  const { goal, articles, equipment, breadcrumbs } =
-    useLoaderData<typeof loader>();
+export default function MuscleSlug() {
+  const { muscles, breadcrumbs } = useLoaderData<typeof loader>();
   const caught = useCatch();
   const { activeOrderFetcher } = useOutletContext<{
     activeOrderFetcher: FetcherWithComponents<CartLoaderData>;
   }>();
   const { activeOrder } = activeOrderFetcher.data ?? {};
 
-  if (!goal) {
-    return <div>Goal not found!</div>;
+  if (!muscles) {
+    return <div>Muscles not found!</div>;
   }
 
   return (
     <div>
       <div className="max-w-6xl mx-auto px-4">
         <h2 className="text-3xl sm:text-5xl font-light tracking-tight text-gray-900 my-8">
-          {goal.attributes.Name}
+          Muscles
         </h2>
         <Breadcrumbs items={breadcrumbs}></Breadcrumbs>
 
-        <FeaturedArticles articles={articles} />
-        <FeaturedEquipment equipment={equipment} />
-        <FeaturedNutrition equipment={[]} />
+        <MusclesList muscles={muscles} />
       </div>
     </div>
   );
@@ -92,7 +68,7 @@ export function CatchBoundary() {
   return (
     <div className="max-w-6xl mx-auto px-4">
       <h2 className="text-3xl sm:text-5xl font-light tracking-tight text-gray-900 my-8">
-        Goal not found!
+        Muscle not found!
       </h2>
       <div className="lg:grid lg:grid-cols-2 lg:gap-x-8 lg:items-start mt-4 md:mt-12">
         {/* Image gallery */}

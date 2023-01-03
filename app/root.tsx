@@ -9,6 +9,7 @@ import {
   useLoaderData,
 } from '@remix-run/react';
 import styles from './styles/app.css';
+import iWorkoutStyles from './styles/iworkout.css';
 import { Header } from './components/header/Header';
 import {
   DataFunctionArgs,
@@ -30,7 +31,10 @@ export const meta: MetaFunction = () => {
 };
 
 export function links() {
-  return [{ rel: 'stylesheet', href: styles }];
+  return [
+    { rel: 'stylesheet', href: styles },
+    { rel: 'stylesheet', href: iWorkoutStyles },
+  ];
 }
 
 const devMode =

@@ -45,6 +45,7 @@ export default function AccountDashboard() {
       <div className="h-96 border-2 border-dashed border-slate-200 rounded-lg flex items-center justify-center">
         <div className="text-xl text-gray-500">
           <Link to="/account/my-orders">My Orders</Link>
+          <Link to="/account/personalisation">Personalisation</Link>
           <p>should next bit be something else</p>
           Account dashboard not done yet.{' '}
           <a

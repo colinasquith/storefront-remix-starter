@@ -6,17 +6,17 @@ interface GoalsListProps {
   goals: any;
 }
 
-export const GoalsList = (props: GoalsListProps) => {
+export const GoalsList = ({ goals }: GoalsListProps) => {
   return (
     <div className="mb-4 mt-4">
       <p className="font-bold">Goals</p>
 
       <div
         className={`mt-4 grid grid-cols-${
-          props.goals?.data?.length >= 4 ? 4 : props.goals?.data?.length
+          goals?.data?.length >= 4 ? 4 : goals?.data?.length
         } gap-4`}
       >
-        {props.goals?.data.map((item: any) => (
+        {goals?.data.map((item: any) => (
           <React.Fragment key={item.id}>
             <JumpCard
               image={
